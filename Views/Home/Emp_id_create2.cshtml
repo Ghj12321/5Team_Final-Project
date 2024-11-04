@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - M.I.S.S</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MVCTest1.styles.css" asp-append-version="true" />
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">M.I.S.S</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav flex-grow-1 justify-content-end">
+                        @{
+                            var userRole = HttpContextAccessor.HttpContext.Session.GetString("Role");
+                        }
+
+                        @if (userRole != "User" && userRole != "Admin")
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Login</a></li>
+                        }
+                        @if (userRole == "User" || userRole == "Admin")
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a></li>
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="companyDropdown" role="button">
+                                MyPage
+                            </a>
+                        </li>
+                        @if (userRole == "Admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="productsDropdown" role="button">
+                                    사원증
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="irDropdown" role="button">
+                                    방문증
+                                </a>
+                            </li>
+                        }
+                        @if (userRole == "User" || userRole == "Admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="careersDropdown" role="button">
+                                    Log
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="mega-menu">
+            <div class="container">
+                <div class="row">
+                    <div class="custom-gap">
+                        <h6>MyPage</h6>
+                        <ul>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="MyPage">나의 정보</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Modify">회원정보수정</a></li>
+                        </ul>
+                    </div>
+                    @if (userRole == "Admin")
+                    {
+                        <div class="custom-gap">
+                            <h6>사원증</h6>
+                            <ul>
+                                <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Emp_id_create">사원증 제작</a></li>
+                            </ul>
+                        </div>
+                    }
+                    @if (userRole == "Admin")
+                    {
+                        <div class="custom-gap">
+                            <h6>방문증</h6>
+                            <ul>
+                                <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Guest_Card_Create2">방문증 제작</a></li>
+                                <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Guest_Card_Create">방문증 등록</a></li>
+                                <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Guest_Card_Receive">방문증 반납</a></li>
+                            </ul>
+                        </div>
+                    }
+                    @if (userRole == "User" || userRole == "Admin")
+                    {
+                        <div class="custom-gap">
+                            <h6>Log</h6>
+                            <ul>
+                                <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Log">Log</a></li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - MVCTest1 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            // 페이지 로드 시 mega-menu를 숨김
+            $(".mega-menu").hide();
+
+            $(".navbar-nav .nav-item").hover(
+                function () {
+                    $(".mega-menu").stop(true, true).slideDown();
+                },
+                function () {
+                    $(".mega-menu").stop(true, true).slideUp();
+                }
+            );
+
+            $(".mega-menu").hover(
+                function () {
+                    $(this).stop(true, true).show();
+                },
+                function () {
+                    $(this).stop(true, true).slideUp();
+                }
+            );
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

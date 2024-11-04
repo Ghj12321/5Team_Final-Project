@@ -1,0 +1,12 @@
+﻿@model MVCTest1.Models.Businesscardinfo
+
+<h1>Businesscard</h1>
+<p>Employee Number: @Model.EmpNumber</p>
+
+<div id="image-container">
+    <h2>명함</h2>
+    <h1>저장하시려면 이미지를 꾹 눌러서 다운로드를 눌러주세요</h1>
+    <img id="employee-image1" src="data:image/png;base64,@Convert.ToBase64String(Model.Businessimg1)" alt="Employee Image 1" />
+    <img id="employee-image2" src="data:image/png;base64,@Convert.ToBase64String(Model.Businessimg2)" alt="Employee Image 2"  />
+   
+</div>

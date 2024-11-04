@@ -1,0 +1,304 @@
+﻿@* <!DOCTYPE html>
+<html>
+<head>
+    <title>방문증 등록</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    <style>
+        #webcam-container, #image-container {
+            display: none;
+        }
+
+        #main-container {
+            display: flex;
+        }
+
+        #form-container {
+            flex: 1;
+        }
+
+        #webcam-container {
+            flex: 1;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>방문증 등록 페이지</h1>
+
+    <div id="main-container">
+        <div id="form-container">
+            <form id="employee-form">
+                <div>
+                    <label for="emp_number">방문 카드번호:</label>
+                    <input type="text" id="emp_number" name="Emp_Number" value=@ViewBag.Guest_num required />
+                </div>
+                <div>
+                    <label for="name">이름:</label>
+                    <input type="text" id="name" name="NameString" value=@ViewBag.name readonly required />
+                </div>
+
+                <input type="hidden" id="webcam-image" name="WebcamImage" />
+                <button type="submit">등록</button>
+            </form>
+        </div>
+
+        <div id="webcam-container">
+            <h2>웹캠</h2>
+            <div id="webcam"></div>
+            <button type="button" id="capture-button">캡처</button>
+        </div>
+    </div>
+
+    <div id="image-container">
+        <h2>복호화된 이미지</h2>
+        <img id="employee-image1" src="" alt="Employee Image 1" />
+        <img id="employee-image2" src="" alt="Employee Image 2" />
+        <button id="save-image-button">확인</button>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // 웹캠 초기화
+            Webcam.set({
+                width: 320,
+                height: 240,
+                image_format: 'jpeg',
+                jpeg_quality: 90
+            });
+
+            $('#employee-form').on('submit', function (event) {
+                event.preventDefault(); // 폼 제출 방지
+                $('#webcam-container').show(); // 웹캠 컨테이너 보이기
+                Webcam.attach('#webcam'); // 웹캠 활성화
+            });
+
+            $('#capture-button').click(function () {
+                Webcam.snap(function (data_uri) {
+                    $('#webcam-image').val(data_uri); // 이미지 데이터를 숨겨진 필드에 설정
+
+                    // AJAX 요청 보내기
+                    $.ajax({
+                        url: '/Home/guest_card_create2',
+                        type: 'POST',
+                        data: $('#employee-form').serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                $('#employee-image1').attr('src', 'data:image/jpeg;base64,' + response.imageData1);
+                                $('#employee-image2').attr('src', 'data:image/jpeg;base64,' + response.imageData2);
+                                $('#image-container').show();
+                                $('#webcam-container').hide();
+                            } else {
+                                alert(response.message || '데이터 처리 중 오류가 발생했습니다.');
+                            }
+                        },
+                        error: function () {
+                            alert('서버와의 통신 중 오류가 발생했습니다.');
+                        }
+                    });
+                });
+            });
+
+            $('#save-image-button').on('click', function () {
+                alert('성공적으로 제작하였습니다.');
+                window.location.href = '/Home';
+            });
+        });
+    </script>
+</body>
+</html>
+
+ *@
+
+@* <!DOCTYPE html>
+<html>
+<head>
+    <title>방문증 등록</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    <style>
+        #webcam-container {
+            display: none;
+        }
+
+        #main-container {
+            display: flex;
+        }
+
+        #form-container {
+            flex: 1;
+        }
+
+        #webcam-container {
+            flex: 1;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>방문증 등록 페이지</h1>
+
+    <div id="main-container">
+        <div id="form-container">
+            <form id="employee-form">
+                <div>
+                    <label for="emp_number">방문 카드번호:</label>
+                    <input type="text" id="emp_number" name="Emp_Number" value="@ViewBag.Guest_num" required />
+                </div>
+                <div>
+                    <label for="name">이름:</label>
+                    <input type="text" id="name" name="NameString" value="@ViewBag.name" readonly required />
+                </div>
+
+                <input type="hidden" id="webcam-image" name="WebcamImage" />
+                <button type="submit">등록</button>
+            </form>
+        </div>
+
+        <div id="webcam-container">
+            <h2>웹캠</h2>
+            <div id="webcam"></div>
+            <button type="button" id="capture-button">캡처</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // 웹캠 초기화
+            Webcam.set({
+                width: 320,
+                height: 240,
+                image_format: 'jpeg',
+                jpeg_quality: 90
+            });
+
+            $('#employee-form').on('submit', function (event) {
+                event.preventDefault(); // 폼 제출 방지
+                $('#webcam-container').show(); // 웹캠 컨테이너 보이기
+                Webcam.attach('#webcam'); // 웹캠 활성화
+            });
+
+            $('#capture-button').click(function () {
+                Webcam.snap(function (data_uri) {
+                    $('#webcam-image').val(data_uri); // 이미지 데이터를 숨겨진 필드에 설정
+
+                    // AJAX 요청 보내기
+                    $.ajax({
+                        url: '/Home/guest_card_create2',
+                        type: 'POST',
+                        data: $('#employee-form').serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                alert('성공적으로 제작하였습니다.');
+                                window.location.href = '/Home';
+                            } else {
+                                alert(response.message || '데이터 처리 중 오류가 발생했습니다.');
+                            }
+                        },
+                        error: function () {
+                            alert('서버와의 통신 중 오류가 발생했습니다.');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+ *@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>방문증 등록</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    <style>
+        #webcam-container, #image-container {
+            display: none;
+        }
+
+        #main-container {
+            display: flex;
+        }
+
+        #form-container {
+            flex: 1;
+        }
+
+        #webcam-container {
+            flex: 1;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>방문증 등록 페이지</h1>
+
+    <div id="main-container">
+        <div id="form-container">
+            <form id="employee-form">
+                <div>
+                    <label for="emp_number">방문 카드번호:</label>
+                    <input type="text" id="emp_number" name="Emp_Number" value="@ViewBag.Guest_num" required />
+                </div>
+                <div>
+                    <label for="name">이름:</label>
+                    <input type="text" id="name" name="NameString" value="@ViewBag.name" readonly required />
+                </div>
+
+                <input type="hidden" id="webcam-image" name="WebcamImage" />
+                <button type="submit">등록</button>
+            </form>
+        </div>
+
+        <div id="webcam-container">
+            <h2>웹캠</h2>
+            <div id="webcam"></div>
+            <button type="button" id="capture-button">캡처</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // 웹캠 초기화
+            Webcam.set({
+                width: 320,
+                height: 240,
+                image_format: 'jpeg',
+                jpeg_quality: 90
+            });
+
+            $('#employee-form').on('submit', function (event) {
+                event.preventDefault(); // 폼 제출 방지
+                $('#webcam-container').show(); // 웹캠 컨테이너 보이기
+                Webcam.attach('#webcam'); // 웹캠 활성화
+            });
+
+            $('#capture-button').click(function () {
+                Webcam.snap(function (data_uri) {
+                    $('#webcam-image').val(data_uri); // 이미지 데이터를 숨겨진 필드에 설정
+
+                    // AJAX 요청 보내기
+                    $.ajax({
+                        url: '/Home/guest_card_create2',
+                        type: 'POST',
+                        data: $('#employee-form').serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                alert('성공적으로 제작하였습니다.');
+                                window.location.href = '/Home';
+                            } else {
+                                alert(response.message || '데이터 처리 중 오류가 발생했습니다.');
+                            }
+                        },
+                        error: function () {
+                            alert('서버와의 통신 중 오류가 발생했습니다.');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

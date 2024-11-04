@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>신분증 인식</title>
+    <script>
+        async function performOCR() {
+            var video = document.getElementById('video');
+            var canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imageDataUrl = canvas.toDataURL('image/png');
+
+            try {
+                const response = await fetch('PerformOCR', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ Image: imageDataUrl })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    // 사용자에게 확인/취소 선택 대화 상자를 보여줌
+                    // if (confirm(`OCR performed successfully. Name: ${data.name}\nDo you want to proceed?`)) {
+                    //     window.location.href = '/Home/emp_id_create2'; // 사용자가 확인을 선택한 경우
+                    // } else {
+                    //     window.location.href = '/Home/emp_id_create'; // 사용자가 취소를 선택한 경우
+                    // }
+                    if (confirm(`OCR performed successfully. Name: ${data.name}\nDo you want to proceed?`)) {
+                        window.location.href = `/Home/emp_id_create2?name=${encodeURIComponent(data.name)}`; // 사용자가 확인을 선택한 경우
+                    } else {
+                        window.location.href = '/Home/emp_id_create'; // 사용자가 취소를 선택한 경우
+                    }
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error performing OCR: ' + error.message);
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            var video = document.getElementById('video');
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                video.srcObject = stream;
+            });
+
+            document.getElementById('ocrButton').addEventListener('click', performOCR);
+        });
+    </script>
+</head>
+<body>
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="ocrButton">Perform OCR</button>
+</body>
+</html>
+
